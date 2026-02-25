@@ -65,7 +65,7 @@ export default function SignInScreen() {
         </Pressable>
 
         <View className="mt-6 flex-row justify-center">
-          <Text className="text-sm text-gray-500">Don't have an account? </Text>
+          <Text className="text-sm text-gray-500">{"Don't have an account? "}</Text>
           <Link href="/(auth)/signup" className="text-sm font-medium text-blue-600">
             Sign up
           </Link>
