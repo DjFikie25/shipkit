@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* Tailwind v4: wire custom fonts into the theme so font-sans/font-mono classes work */
+@theme {
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --color-primary: #0070f3;
+}
+
+/* Smooth focus rings */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

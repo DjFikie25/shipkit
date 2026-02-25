@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShipKit — Full-Stack Starter for Next.js + React Native</title>
+  <meta name="description" content="Production-ready monorepo starter: Next.js 15, Expo 54, Better Auth, Mastra AI, Neon Postgres, Tailwind v4. Clone once, ship forever." />
+  <meta property="og:title" content="ShipKit" />
+  <meta property="og:description" content="Production-ready monorepo starter: Next.js 15, Expo 54, Better Auth, Mastra AI, Neon Postgres, Tailwind v4." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://chitamoor.github.io/shipkit/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Geist', 'Inter', 'system-ui', 'sans-serif'],
+            mono: ['Geist Mono', 'Fira Code', 'Cascadia Code', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    * { box-sizing: border-box; }
+
+    /* ---------- base ---------- */
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; }
+
+    /* ---------- subtle noise texture on dark hero ---------- */
+    .hero-noise {
+      background-image:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(99,102,241,.10) 0%, transparent 70%);
+    }
+    .dark .hero-noise {
+      background-image:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(99,102,241,.18) 0%, transparent 70%);
+    }
+
+    /* ---------- animated terminal ---------- */
+    #terminal-lines > div {
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity .3s ease, transform .3s ease;
+    }
+    #terminal-lines > div.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ---------- blinking cursor ---------- */
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    .cursor { display: inline-block; width: 8px; height: 1em; background: currentColor; animation: blink 1s step-end infinite; vertical-align: text-bottom; margin-left: 2px; }
+
+    /* ---------- card lift ---------- */
+    .card-lift {
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .card-lift:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px -8px rgba(0,0,0,.10);
+    }
+    .dark .card-lift:hover {
+      box-shadow: 0 12px 32px -8px rgba(0,0,0,.40);
+    }
+
+    /* ---------- copy button ---------- */
+    .copy-btn { transition: opacity .2s ease; }
+
+    /* ---------- feature icon ring ---------- */
+    .icon-ring { transition: background .2s ease; }
+  </style>
+</head>
+
+<!-- On load: respect system preference -->
+<script>
+  (function() {
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.classList.add('dark');
+    }
+  })();
+</script>
+
+<body class="bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-100 antialiased transition-colors duration-200">
+
+<!-- ================================================================
+     NAV
+================================================================ -->
+<nav class="fixed top-0 inset-x-0 z-50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-gray-200/60 dark:border-zinc-800/60">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+
+    <a href="#" class="flex items-center gap-2 font-semibold text-gray-900 dark:text-white text-sm">
+      <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+      </svg>
+      ShipKit
+    </a>
+
+    <div class="flex items-center gap-1 sm:gap-4">
+      <a href="#features" class="hidden sm:block text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors px-2 py-1">Features</a>
+      <a href="#quickstart" class="hidden sm:block text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors px-2 py-1">Quick start</a>
+      <a href="#stack" class="hidden sm:block text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors px-2 py-1">Stack</a>
+
+      <!-- Dark mode toggle -->
+      <button id="theme-toggle" aria-label="Toggle dark mode"
+        class="p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
+        <!-- Sun -->
+        <svg id="icon-sun" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/><path stroke-linecap="round" d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+        <!-- Moon -->
+        <svg id="icon-moon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+
+      <a href="https://github.com/chitamoor/shipkit"
+         target="_blank" rel="noopener"
+         class="flex items-center gap-1.5 text-sm font-medium bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-3 py-1.5 rounded-lg hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+        GitHub
+      </a>
+    </div>
+
+  </div>
+</nav>
+
+<!-- ================================================================
+     HERO
+================================================================ -->
+<section class="hero-noise pt-32 pb-20 px-4 sm:px-6 text-center">
+  <div class="max-w-4xl mx-auto">
+
+    <!-- badge -->
+    <div class="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full mb-8
+                bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300
+                border border-gray-200 dark:border-zinc-700">
+      <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+      Open source &nbsp;·&nbsp; MIT license
+    </div>
+
+    <h1 class="text-5xl sm:text-7xl font-black tracking-tight leading-[1.05] mb-6 text-gray-900 dark:text-white">
+      Ship your product<br />
+      <span class="text-indigo-600 dark:text-indigo-400">in days, not months.</span>
+    </h1>
+
+    <p class="text-lg sm:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+      A production-ready monorepo with <strong class="text-gray-800 dark:text-gray-200">Next.js 15</strong>,
+      <strong class="text-gray-800 dark:text-gray-200">Expo</strong>,
+      <strong class="text-gray-800 dark:text-gray-200">Better Auth</strong>,
+      <strong class="text-gray-800 dark:text-gray-200">Mastra AI</strong>,
+      and <strong class="text-gray-800 dark:text-gray-200">Neon Postgres</strong>.
+      Batteries included.
+    </p>
+
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+      <a href="https://github.com/chitamoor/shipkit/generate"
+         target="_blank" rel="noopener"
+         class="w-full sm:w-auto inline-flex items-center justify-center gap-2
+                bg-gray-900 dark:bg-white text-white dark:text-gray-900
+                font-semibold px-6 py-3 rounded-lg text-sm
+                hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+        Use this template
+      </a>
+      <a href="https://github.com/chitamoor/shipkit"
+         target="_blank" rel="noopener"
+         class="w-full sm:w-auto inline-flex items-center justify-center gap-2
+                bg-white dark:bg-zinc-900 text-gray-700 dark:text-gray-300
+                font-semibold px-6 py-3 rounded-lg text-sm
+                border border-gray-200 dark:border-zinc-700
+                hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+        View on GitHub
+      </a>
+    </div>
+
+    <!-- animated terminal -->
+    <div class="mt-12 max-w-lg mx-auto text-left">
+      <div class="rounded-xl overflow-hidden border border-zinc-800 shadow-2xl bg-zinc-950">
+        <!-- title bar -->
+        <div class="flex items-center gap-1.5 px-4 py-2.5 bg-zinc-900 border-b border-zinc-800">
+          <span class="w-3 h-3 rounded-full bg-red-500/80"></span>
+          <span class="w-3 h-3 rounded-full bg-yellow-500/80"></span>
+          <span class="w-3 h-3 rounded-full bg-green-500/80"></span>
+          <span class="ml-3 text-xs text-zinc-500 font-mono">~/my-app</span>
+        </div>
+        <!-- lines -->
+        <div id="terminal-lines" class="px-5 py-4 font-mono text-sm leading-7 min-h-[7rem]">
+          <div>
+            <span class="text-zinc-500">$</span>
+            <span class="text-emerald-400"> gh repo create</span>
+            <span class="text-amber-300"> my-app</span>
+            <span class="text-sky-300"> --template chitamoor/shipkit</span>
+          </div>
+          <div>
+            <span class="text-zinc-500">$</span>
+            <span class="text-emerald-400"> cd</span>
+            <span class="text-amber-300"> my-app</span>
+            <span class="text-zinc-500"> &amp;&amp;</span>
+            <span class="text-emerald-400"> pnpm install</span>
+          </div>
+          <div>
+            <span class="text-zinc-500">$</span>
+            <span class="text-emerald-400"> pnpm dev:web</span>
+          </div>
+          <div class="text-emerald-400">
+            ✓ Ready on
+            <span class="underline underline-offset-2">http://localhost:3000</span>
+            <span class="cursor" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================================================================
+     STATS BAR
+================================================================ -->
+<div class="border-y border-gray-100 dark:border-zinc-800 bg-gray-50/60 dark:bg-zinc-900/60 py-5">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-sm text-gray-500 dark:text-gray-400">
+    <div class="flex items-center gap-2">
+      <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>
+      </svg>
+      <span>TypeScript-first</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2zM12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
+      </svg>
+      <span>Web + Mobile</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+      </svg>
+      <span>CI / CD ready</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+      </svg>
+      <span>AI agents included</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"/>
+      </svg>
+      <span>MIT license</span>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     FEATURES
+================================================================ -->
+<section id="features" class="py-24 px-4 sm:px-6">
+  <div class="max-w-6xl mx-auto">
+
+    <div class="text-center mb-16">
+      <p class="text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-3">What's included</p>
+      <h2 class="text-3xl sm:text-4xl font-black tracking-tight text-gray-900 dark:text-white">Everything you need to ship</h2>
+      <p class="mt-3 text-gray-500 dark:text-gray-400 text-lg max-w-xl mx-auto">Every production concern solved on day one. No yak-shaving required.</p>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+      <!-- Auth -->
+      <div class="card-lift bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-gray-100 dark:border-zinc-800">
+        <div class="icon-ring w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-950/50 flex items-center justify-center mb-5">
+          <svg class="w-5 h-5 text-violet-600 dark:text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0 1 12 2.944a11.955 11.955 0 0 1-8.618 3.04A12.02 12.02 0 0 0 3 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <h3 class="font-semibold text-gray-900 dark:text-white mb-1.5">Auth, done right</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">Better Auth with email/password, Google OAuth, and password reset — all optional and env-driven. Works on web and mobile out of the box.</p>
+      </div>
+
+      <!-- AI -->
+      <div class="card-lift bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-gray-100 dark:border-zinc-800">
+        <div class="icon-ring w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center mb-5">
+          <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+          </svg>
+        </div>
+        <h3 class="font-semibold text-gray-900 dark:text-white mb-1.5">Multi-provider AI</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">Mastra agents with streaming chat. Swap between Groq, OpenAI, Anthropic, and Google by changing one env var — no code changes needed.</p>
+      </div>
+
+      <!-- Mobile -->
+      <div class="card-lift bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-gray-100 dark:border-zinc-800">
+        <div class="icon-ring w-10 h-10 rounded-xl bg-pink-50 dark:bg-pink-950/50 flex items-center justify-center mb-5">
+          <svg class="w-5 h-5 text-pink-600 dark:text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+            <line x1="12" y1="18" x2="12.01" y2="18" stroke-linecap="round" stroke-width="3"/>
+          </svg>
+        </div>
+        <h3 class="font-semibold text-gray-900 dark:text-white mb-1.5">Native mobile</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">Expo SDK 54 + React Native 0.76 with NativeWind v4 for styling. Shares auth and API client with the web app via the monorepo.</p>
+      </div>
+
+      <!-- DB -->
+      <div class="card-lift bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-gray-100 dark:border-zinc-800">
+        <div class="icon-ring w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center mb-5">
+          <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <ellipse cx="12" cy="5" rx="9" ry="3"/>
+            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+          </svg>
+        </div>
+        <h3 class="font-semibold text-gray-900 dark:text-white mb-1.5">Neon Postgres + Drizzle</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">Serverless Postgres via Neon with a production-safe connection pool and automatic SSL. Drizzle ORM for fully type-safe queries.</p>
+      </div>
+
+      <!-- Tests -->
+      <div class="card-lift bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-gray-100 dark:border-zinc-800">
+        <div class="icon-ring w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/50 flex items-center justify-center mb-5">
+          <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 0 0 1.946-.806 3.42 3.42 0 0 1 4.438 0 3.42 3.42 0 0 0 1.946.806 3.42 3.42 0 0 1 3.138 3.138 3.42 3.42 0 0 0 .806 1.946 3.42 3.42 0 0 1 0 4.438 3.42 3.42 0 0 0-.806 1.946 3.42 3.42 0 0 1-3.138 3.138 3.42 3.42 0 0 0-1.946.806 3.42 3.42 0 0 1-4.438 0 3.42 3.42 0 0 0-1.946-.806 3.42 3.42 0 0 1-3.138-3.138 3.42 3.42 0 0 0-.806-1.946 3.42 3.42 0 0 1 0-4.438 3.42 3.42 0 0 0 .806-1.946 3.42 3.42 0 0 1 3.138-3.138z"/>
+          </svg>
+        </div>
+        <h3 class="font-semibold text-gray-900 dark:text-white mb-1.5">Tests included</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">Vitest unit tests across all packages. Playwright E2E across Chromium, Firefox, and Mobile Chrome. GitHub Actions CI wired up from day one.</p>
+      </div>
+
+      <!-- DX -->
+      <div class="card-lift bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-gray-100 dark:border-zinc-800">
+        <div class="icon-ring w-10 h-10 rounded-xl bg-cyan-50 dark:bg-cyan-950/50 flex items-center justify-center mb-5">
+          <svg class="w-5 h-5 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        <h3 class="font-semibold text-gray-900 dark:text-white mb-1.5">Best-in-class DX</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">Turborepo monorepo with pnpm workspaces, Tailwind CSS v4, TypeScript strict mode, Prettier, ESLint, and AI coding guidelines via AGENTS.md.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     QUICK START
+================================================================ -->
+<section id="quickstart" class="py-24 px-4 sm:px-6 bg-gray-50 dark:bg-zinc-900/50">
+  <div class="max-w-3xl mx-auto">
+
+    <div class="text-center mb-14">
+      <p class="text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-3">Get started</p>
+      <h2 class="text-3xl sm:text-4xl font-black tracking-tight text-gray-900 dark:text-white">Up and running in minutes</h2>
+      <p class="mt-3 text-gray-500 dark:text-gray-400 text-lg">Four steps from zero to a working full-stack app.</p>
+    </div>
+
+    <div class="space-y-3">
+
+      <!-- Step 1 -->
+      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 overflow-hidden">
+        <div class="flex items-center gap-3 px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
+          <div class="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center">1</div>
+          <p class="font-semibold text-gray-900 dark:text-white text-sm">Create your repo from the template</p>
+        </div>
+        <pre class="bg-zinc-950 text-sm font-mono px-5 py-4 overflow-x-auto leading-6"><code><span class="text-zinc-400">$</span> <span class="text-emerald-400">gh repo create</span> <span class="text-amber-300">my-app</span> <span class="text-sky-300">--template chitamoor/shipkit --private</span>
+<span class="text-zinc-400">$</span> <span class="text-emerald-400">cd</span> <span class="text-amber-300">my-app</span> <span class="text-zinc-400">&amp;&amp;</span> <span class="text-emerald-400">pnpm install</span></code></pre>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 overflow-hidden">
+        <div class="flex items-center gap-3 px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
+          <div class="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center">2</div>
+          <p class="font-semibold text-gray-900 dark:text-white text-sm">Configure your env <span class="text-gray-400 dark:text-gray-500 font-normal">(only 5 vars required)</span></p>
+        </div>
+        <pre class="bg-zinc-950 text-sm font-mono px-5 py-4 overflow-x-auto leading-6"><code><span class="text-zinc-500"># apps/web/.env.local</span>
+<span class="text-sky-300">BETTER_AUTH_SECRET</span>=<span class="text-amber-300">your-secret</span>     <span class="text-zinc-500"># openssl rand -base64 32</span>
+<span class="text-sky-300">BETTER_AUTH_URL</span>=http://localhost:3000
+<span class="text-sky-300">NEXT_PUBLIC_APP_URL</span>=http://localhost:3000
+<span class="text-sky-300">DATABASE_URL</span>=<span class="text-amber-300">postgresql://...</span>     <span class="text-zinc-500"># Neon connection string</span>
+<span class="text-sky-300">GROQ_API_KEY</span>=<span class="text-amber-300">gsk_...</span>              <span class="text-zinc-500"># free tier at console.groq.com</span></code></pre>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 overflow-hidden">
+        <div class="flex items-center gap-3 px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
+          <div class="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center">3</div>
+          <p class="font-semibold text-gray-900 dark:text-white text-sm">Run database migrations</p>
+        </div>
+        <pre class="bg-zinc-950 text-sm font-mono px-5 py-4 overflow-x-auto leading-6"><code><span class="text-zinc-400">$</span> <span class="text-emerald-400">cd apps/web</span>
+<span class="text-zinc-400">$</span> <span class="text-emerald-400">pnpm dlx better-auth@latest migrate</span>   <span class="text-zinc-500"># auth tables</span>
+<span class="text-zinc-400">$</span> <span class="text-emerald-400">pnpm db:generate &amp;&amp; pnpm db:migrate</span>   <span class="text-zinc-500"># app tables</span></code></pre>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 overflow-hidden">
+        <div class="flex items-center gap-3 px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
+          <div class="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center">4</div>
+          <p class="font-semibold text-gray-900 dark:text-white text-sm">Start developing</p>
+        </div>
+        <pre class="bg-zinc-950 text-sm font-mono px-5 py-4 overflow-x-auto leading-6"><code><span class="text-zinc-400">$</span> <span class="text-emerald-400">pnpm dev:web</span>      <span class="text-zinc-500"># web only  → localhost:3000</span>
+<span class="text-zinc-400">$</span> <span class="text-emerald-400">pnpm dev:mobile</span>   <span class="text-zinc-500"># mobile    → Expo Go</span>
+<span class="text-zinc-400">$</span> <span class="text-emerald-400">pnpm dev</span>          <span class="text-zinc-500"># everything at once</span></code></pre>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     TECH STACK
+================================================================ -->
+<section id="stack" class="py-24 px-4 sm:px-6">
+  <div class="max-w-4xl mx-auto">
+
+    <div class="text-center mb-14">
+      <p class="text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-3">The stack</p>
+      <h2 class="text-3xl sm:text-4xl font-black tracking-tight text-gray-900 dark:text-white">Modern at every layer</h2>
+      <p class="mt-3 text-gray-500 dark:text-gray-400 text-lg">Stable, battle-tested, and version-locked.</p>
+    </div>
+
+    <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="flex items-center justify-between bg-white dark:bg-zinc-900 rounded-xl px-4 py-3.5 border border-gray-100 dark:border-zinc-800">
+        <span class="text-sm text-gray-600 dark:text-gray-400">Web framework</span>
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900">Next.js 15</span>
+      </div>
+      <div class="flex items-center justify-between bg-white dark:bg-zinc-900 rounded-xl px-4 py-3.5 border border-gray-100 dark:border-zinc-800">
+        <span class="text-sm text-gray-600 dark:text-gray-400">Mobile framework</span>
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-600 text-white">Expo SDK 54</span>
+      </div>
+      <div class="flex items-center justify-between bg-white dark:bg-zinc-900 rounded-xl px-4 py-3.5 border border-gray-100 dark:border-zinc-800">
+        <span class="text-sm text-gray-600 dark:text-gray-400">Auth</span>
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-violet-600 text-white">Better Auth 1.4</span>
+      </div>
+      <div class="flex items-center justify-between bg-white dark:bg-zinc-900 rounded-xl px-4 py-3.5 border border-gray-100 dark:border-zinc-800">
+        <span class="text-sm text-gray-600 dark:text-gray-400">Database</span>
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-600 text-white">Neon Postgres</span>
+      </div>
+      <div class="flex items-center justify-between bg-white dark:bg-zinc-900 rounded-xl px-4 py-3.5 border border-gray-100 dark:border-zinc-800">
+        <span class="text-sm text-gray-600 dark:text-gray-400">ORM</span>
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-orange-500 text-white">Drizzle ORM</span>
+      </div>
+      <div class="flex items-center justify-between bg-white dark:bg-zinc-900 rounded-xl px-4 py-3.5 border border-gray-100 dark:border-zinc-800">
+        <span class="text-sm text-gray-600 dark:text-gray-400">AI agents</span>
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-600 text-white">Mastra AI</span>
+      </div>
+      <div class="flex items-center justify-between bg-white dark:bg-zinc-900 rounded-xl px-4 py-3.5 border border-gray-100 dark:border-zinc-800">
+        <span class="text-sm text-gray-600 dark:text-gray-400">LLM providers</span>
+        <span class="text-xs text-gray-500 dark:text-gray-400">Groq · OpenAI · Anthropic · Google</span>
+      </div>
+      <div class="flex items-center justify-between bg-white dark:bg-zinc-900 rounded-xl px-4 py-3.5 border border-gray-100 dark:border-zinc-800">
+        <span class="text-sm text-gray-600 dark:text-gray-400">Styling (web)</span>
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-sky-500 text-white">Tailwind CSS v4</span>
+      </div>
+      <div class="flex items-center justify-between bg-white dark:bg-zinc-900 rounded-xl px-4 py-3.5 border border-gray-100 dark:border-zinc-800">
+        <span class="text-sm text-gray-600 dark:text-gray-400">Styling (mobile)</span>
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-sky-600 text-white">NativeWind v4</span>
+      </div>
+      <div class="flex items-center justify-between bg-white dark:bg-zinc-900 rounded-xl px-4 py-3.5 border border-gray-100 dark:border-zinc-800">
+        <span class="text-sm text-gray-600 dark:text-gray-400">Monorepo</span>
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-red-500 text-white">Turborepo</span>
+      </div>
+      <div class="flex items-center justify-between bg-white dark:bg-zinc-900 rounded-xl px-4 py-3.5 border border-gray-100 dark:border-zinc-800">
+        <span class="text-sm text-gray-600 dark:text-gray-400">Unit tests</span>
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-yellow-500 text-white">Vitest 4</span>
+      </div>
+      <div class="flex items-center justify-between bg-white dark:bg-zinc-900 rounded-xl px-4 py-3.5 border border-gray-100 dark:border-zinc-800">
+        <span class="text-sm text-gray-600 dark:text-gray-400">E2E tests</span>
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-teal-600 text-white">Playwright</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================================================================
+     CTA
+================================================================ -->
+<section class="py-24 px-4 sm:px-6 bg-gray-900 dark:bg-zinc-900">
+  <div class="max-w-2xl mx-auto text-center">
+    <h2 class="text-3xl sm:text-5xl font-black tracking-tight mb-4 text-white">Ready to ship?</h2>
+    <p class="text-gray-400 text-lg mb-10 leading-relaxed">
+      Stop rebuilding the same boilerplate. Start with ShipKit and focus on what makes your product unique.
+    </p>
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+      <a href="https://github.com/chitamoor/shipkit/generate"
+         target="_blank" rel="noopener"
+         class="w-full sm:w-auto inline-flex items-center justify-center gap-2
+                bg-white text-gray-900 font-semibold px-8 py-3.5 rounded-lg text-sm
+                hover:bg-gray-100 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+        Use this template
+      </a>
+      <a href="https://github.com/chitamoor/shipkit"
+         target="_blank" rel="noopener"
+         class="w-full sm:w-auto inline-flex items-center justify-center gap-2
+                text-gray-300 font-medium px-8 py-3.5 rounded-lg text-sm
+                border border-zinc-700 hover:bg-zinc-800 transition-colors">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+        View source
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     FOOTER
+================================================================ -->
+<footer class="border-t border-gray-100 dark:border-zinc-800 py-8 px-4 sm:px-6 bg-white dark:bg-zinc-950">
+  <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+      <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+      </svg>
+      <span><strong class="text-gray-900 dark:text-white">ShipKit</strong> — MIT License</span>
+    </div>
+    <div class="flex items-center gap-6 text-sm text-gray-500 dark:text-gray-400">
+      <a href="https://github.com/chitamoor/shipkit" target="_blank" rel="noopener" class="hover:text-gray-900 dark:hover:text-white transition-colors">GitHub</a>
+      <a href="https://github.com/chitamoor/shipkit/issues" target="_blank" rel="noopener" class="hover:text-gray-900 dark:hover:text-white transition-colors">Issues</a>
+      <a href="https://github.com/chitamoor/shipkit/blob/main/README.md" target="_blank" rel="noopener" class="hover:text-gray-900 dark:hover:text-white transition-colors">Docs</a>
+      <a href="https://github.com/chitamoor" target="_blank" rel="noopener" class="hover:text-gray-900 dark:hover:text-white transition-colors">@chitamoor</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ================================================================
+     JAVASCRIPT
+================================================================ -->
+<script>
+  // ----- dark mode toggle -----
+  const toggle = document.getElementById('theme-toggle');
+  toggle.addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark');
+  });
+
+  // ----- animated terminal -----
+  (function () {
+    const container = document.getElementById('terminal-lines');
+    const lines = Array.from(container.children);
+    let idx = 0;
+
+    function revealNext() {
+      if (idx < lines.length) {
+        lines[idx].classList.add('visible');
+        idx++;
+        setTimeout(revealNext, idx === lines.length ? 0 : 550);
+      }
+    }
+
+    // Start after a short delay so the hero loads first
+    setTimeout(revealNext, 600);
+  })();
+</script>
+
+</body>
+</html>
