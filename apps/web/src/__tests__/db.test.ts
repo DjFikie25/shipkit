@@ -57,12 +57,12 @@ describe('getPool()', () => {
       'postgresql://user:pass@ep-xxx.neon.tech/db?sslmode=require';
     getPool();
 
-    const callArg = MockPool.mock.calls[0]?.[0] as {
+    const callArg = (MockPool.mock.calls as unknown[][])[0]?.[0] as {
       connectionString: string;
       ssl: { rejectUnauthorized: boolean };
     };
-    expect(callArg.connectionString).not.toContain('sslmode');
-    expect(callArg.ssl.rejectUnauthorized).toBe(false);
+    expect(callArg?.connectionString).not.toContain('sslmode');
+    expect(callArg?.ssl.rejectUnauthorized).toBe(false);
   });
 
   it('strips channel_binding from the DATABASE_URL before passing to Pool', () => {
@@ -70,8 +70,8 @@ describe('getPool()', () => {
       'postgresql://user:pass@ep-xxx.neon.tech/db?channel_binding=require&sslmode=verify-full';
     getPool();
 
-    const callArg = MockPool.mock.calls[0]?.[0] as { connectionString: string };
-    expect(callArg.connectionString).not.toContain('channel_binding');
-    expect(callArg.connectionString).not.toContain('sslmode');
+    const callArg = (MockPool.mock.calls as unknown[][])[0]?.[0] as { connectionString: string };
+    expect(callArg?.connectionString).not.toContain('channel_binding');
+    expect(callArg?.connectionString).not.toContain('sslmode');
   });
 });

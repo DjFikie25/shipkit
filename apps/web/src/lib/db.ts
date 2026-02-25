@@ -4,7 +4,7 @@
  * Uses a module-level singleton so the pool is shared across hot reloads
  * in development (stored on `global`) and across requests in production.
  */
-import { Pool } from 'pg';
+import { Pool, type QueryResultRow } from 'pg';
 
 declare global {
   // `var` is required in `declare global` — cannot use const/let
@@ -41,13 +41,13 @@ export function getPool(): Pool {
 }
 
 /** Run a SELECT query and return typed rows. */
-export async function dbQuery<T>(sql: string, params?: unknown[]): Promise<T[]> {
+export async function dbQuery<T extends QueryResultRow>(sql: string, params?: unknown[]): Promise<T[]> {
   const { rows } = await getPool().query<T>(sql, params);
   return rows;
 }
 
 /** Run a SELECT query and return the first row or null. */
-export async function dbQueryOne<T>(sql: string, params?: unknown[]): Promise<T | null> {
+export async function dbQueryOne<T extends QueryResultRow>(sql: string, params?: unknown[]): Promise<T | null> {
   const rows = await dbQuery<T>(sql, params);
   return rows[0] ?? null;
 }

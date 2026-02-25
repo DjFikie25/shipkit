@@ -1,8 +1,7 @@
 import { View, Text, Pressable, ScrollView } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSession, authClient } from '@/lib/auth-client';
-import { router } from 'expo-router';
 
 export default function HomeScreen() {
   const { data: session } = useSession();

@@ -30,7 +30,7 @@ export function createApiClient(config: ClientConfig) {
         method,
         headers,
         credentials: 'include',
-        body: body !== undefined ? JSON.stringify(body) : undefined,
+        ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
       });
 
       if (!res.ok) {

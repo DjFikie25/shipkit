@@ -7,7 +7,7 @@
     "dev": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "lint": "expo lint",
+    "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf .expo"
   },
@@ -35,6 +35,8 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~18.3.12",
+    "eslint": "^9.0.0",
+    "eslint-config-expo": "~10.0.0",
     "typescript": "^5.8.3"
   }
 }

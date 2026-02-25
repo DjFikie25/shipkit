@@ -2,6 +2,7 @@ import { Agent } from '@mastra/core/agent';
 import { getMastraModel } from '@/lib/ai-model';
 
 export const assistantAgent = new Agent({
+  id: 'assistantAgent',
   name: 'Assistant',
   instructions: `You are a helpful, friendly AI assistant.
 Be concise and direct. Format responses with markdown when it improves readability.

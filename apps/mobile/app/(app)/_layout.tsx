@@ -1,6 +1,5 @@
-import { Tabs } from 'expo-router';
+import { Tabs, Redirect } from 'expo-router';
 import { useSession } from '@/lib/auth-client';
-import { Redirect } from 'expo-router';
 import { View, ActivityIndicator } from 'react-native';
 
 export default function AppLayout() {

@@ -70,7 +70,7 @@ export default function ChatScreen() {
           }
         }
       }
-    } catch (err) {
+    } catch {
       const errMsg: Message = {
         id: `err_${Date.now()}`,
         role: 'assistant',
