@@ -133,7 +133,7 @@ jobs:
           key: nextjs-build-${{ github.sha }}
 
       - name: Install Playwright browsers
-        run: pnpm --filter=@template/web exec playwright install --with-deps chromium
+        run: pnpm --filter=@template/web exec playwright install --with-deps
 
       - name: Run E2E tests
         run: pnpm test:e2e
